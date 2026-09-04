@@ -1,0 +1,47 @@
+---
+
+- name: Config VPS
+  hosts: vps
+
+  tasks:
+    - name: Create user
+      ansible.builtin.user:
+        name: "{{ admin_user }}"
+        password: "{{ vault_admin_password | password_hash('sha512', admin_password_salt) }}"
+        create_home: true
+        shell: /bin/bash
+        groups:
+          - sudo
+        append: true
+
+    - name: Set server_hostname
+      ansible.builtin.hostname:
+        name: "{{ server_hostname }}"
+
+    - name: Add SSH key for admin user
+      ansible.posix.authorized_key:
+        user: "{{ admin_user }}"
+        state: present
+        key: "{{ lookup('file', '~/.ssh/iac_lab.pub') }}"
+
+    - name: Disable SSH root login
+      ansible.builtin.copy:
+        dest: /etc/ssh/sshd_config.d/99-hardening.conf
+        content: |
+          # Managed by Ansible
+          PermitRootLogin no
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload SSH
+
+    - name: Validate SSH config
+      ansible.builtin.command:
+        cmd: sshd -t
+      changed_when: false
+
+  handlers:
+    - name: Reload SSH
+      ansible.builtin.service:
+        name: ssh
+        state: reloaded

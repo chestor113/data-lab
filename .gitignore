@@ -1,0 +1,44 @@
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfplan
+
+# Terraform variable files — могут содержать секреты
+*.tfvars
+*.tfvars.json
+
+# Terraform CLI local overrides
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ansible temporary/retry files
+*.retry
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Secrets / keys
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# Local environment files
+.env
+.env.*
