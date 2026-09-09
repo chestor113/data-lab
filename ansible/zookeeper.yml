@@ -1,0 +1,39 @@
+---
+
+- name: Conf zoo
+  hosts: kafka
+  become: true
+
+  tasks:
+    - name: Create Kafka configuration directory
+      ansible.builtin.file:
+        path: /etc/kafka
+        state: directory
+        owner: root
+        group: kafka
+        mode: "0750"
+
+    - name: Create ZooKeeper data directory
+      ansible.builtin.file:
+        path: /var/lib/zookeeper
+        state: directory
+        owner: kafka
+        group: kafka
+        mode: "0750"
+
+
+    - name: Create ZooKeeper myid
+      ansible.builtin.copy:
+        content: "{{ zookeeper_id }}\n"
+        dest: /var/lib/zookeeper/myid
+        owner: kafka
+        group: kafka
+        mode: "0640"
+
+    - name: Copy Zoo config
+      ansible.builtin.template:
+        src: templates/zookeeper.properties.j2
+        dest: /etc/kafka/zookeeper.properties
+        owner: root
+        group: kafka
+        mode: "0640"

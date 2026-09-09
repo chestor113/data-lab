@@ -1,0 +1,62 @@
+---
+- name: Config gateway
+  hosts: gateway
+  become: true
+
+  tasks:
+    - name: Congif backend interface
+      ansible.builtin.template:
+        src: templates/backend.j2
+        dest: /etc/network/interfaces.d/backend
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Check backend interface address
+      ansible.builtin.command: ip -4 addr show dev eth1
+      register: eth1_state
+      changed_when: false
+
+    - name: Debug var
+      ansible.builtin.debug:
+        var: eth1_state
+
+
+    - name: Bring up backend interface
+      ansible.builtin.command: ifup eth1
+      when: backend_ip not in eth1_state.stdout
+
+    - name: Install procps
+      ansible.builtin.apt:
+        name: procps
+        state: present
+        update_cache: true
+
+    - name: Set forwarding
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_set: true
+        state: present
+        reload: true
+
+    - name: Install nftables
+      ansible.builtin.apt:
+        name: nftables
+        state: present
+        update_cache: true
+
+    - name: Copy nftables rules
+      ansible.builtin.template:
+        src: templates/nftables.conf.j2
+        dest: /etc/nftables.conf
+        owner: root
+        group: root
+        mode: "0644"
+        validate: /usr/sbin/nft -c -f %s
+      notify: Reload nftables
+
+  handlers:
+    - name: Reload nftables
+      ansible.builtin.command:
+        cmd: /usr/sbin/nft -f /etc/nftables.conf
