@@ -1,0 +1,14 @@
+[Unit]
+Description=Config zoo as a Service
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=kafka
+Group=kafka
+ExecStart=/opt/kafka/bin/zookeeper-server-start.sh /etc/kafka/zookeeper.properties
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

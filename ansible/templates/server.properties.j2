@@ -1,0 +1,9 @@
+broker.id={{ kafka_broker_id }}
+
+listeners=PLAINTEXT://0.0.0.0:9092
+
+advertised.listeners=PLAINTEXT://{{ ansible_host }}:9092
+
+log.dirs=/var/lib/kafka
+
+zookeeper.connect=10.10.20.11:2181,10.10.20.12:2181,10.10.20.13:2181
