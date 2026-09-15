@@ -2,7 +2,7 @@ broker.id={{ kafka_broker_id }}
 
 listeners=PLAINTEXT://0.0.0.0:9092
 
-advertised.listeners=PLAINTEXT://{{ ansible_host }}:9092
+advertised.listeners=PLAINTEXT://{{ kafka_ip }}:9092
 
 log.dirs=/var/lib/kafka
 

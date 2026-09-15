@@ -1,0 +1,20 @@
+---
+- name: Install strongSwan
+  hosts: ipsec_gateways
+  become: true
+
+  tasks:
+    - name: Install modern strongSwan stack
+      ansible.builtin.apt:
+        name:
+          - charon-systemd
+          - strongswan-swanctl
+        state: present
+        update_cache: true
+
+    - name: Remove legacy strongSwan starter
+      ansible.builtin.apt:
+        name:
+          - strongswan-starter
+          - strongswan-charon
+        state: absent
