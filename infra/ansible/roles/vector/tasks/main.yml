@@ -1,0 +1,48 @@
+---
+# tasks file for roles/vector
+
+- name: Install curl
+  ansible.builtin.apt:
+    name: curl
+    state: present
+    update_cache: true
+
+- name: Check Vector repository
+  ansible.builtin.stat:
+    path: /etc/apt/sources.list.d/vector.list
+  register: vector_repo
+
+- name: Add Vector APT repository
+  ansible.builtin.shell:
+    cmd: bash -c "$(curl -L https://setup.vector.dev)"
+  when: not vector_repo.stat.exists
+
+- name: Install Vector
+  ansible.builtin.apt:
+    name: vector
+    state: present
+    update_cache: true
+
+- name: Create Vector checkpoint directory
+  ansible.builtin.file:
+    path: /var/lib/vector/security-journal/journald
+    state: directory
+    owner: vector
+    group: vector
+    mode: "0755"
+
+- name: Deploy Vector configuration
+  ansible.builtin.template:
+    src: vector.yaml.j2
+    dest: /etc/vector/vector.yaml
+    owner: root
+    group: root
+    mode: "0644"
+    validate: /usr/bin/vector validate --config-yaml %s
+  notify: Restart Vector
+
+- name: Enable and start Vector
+  ansible.builtin.systemd_service:
+    name: vector
+    enabled: true
+    state: started

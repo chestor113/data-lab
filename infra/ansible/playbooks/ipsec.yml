@@ -4,11 +4,13 @@
   become: true
 
   tasks:
+
     - name: Install modern strongSwan stack
       ansible.builtin.apt:
         name:
           - charon-systemd
           - strongswan-swanctl
+          - libstrongswan-extra-plugins
         state: present
         update_cache: true
 
@@ -18,3 +20,34 @@
           - strongswan-starter
           - strongswan-charon
         state: absent
+
+    - name: Deploy swanctl configuration
+      ansible.builtin.template:
+        src: "{{ '../templates/swanctl-lb01.conf.j2' if inventory_hostname == 'lb01' else '../templates/swanctl.conf.j2' }}"
+        dest: /etc/swanctl/swanctl.conf
+        owner: root
+        group: root
+        mode: "0600"
+      notify: Reload strongSwan config
+      
+    - name: Check whether LPE blacklist file exists
+      ansible.builtin.stat:
+        path: /etc/modprobe.d/blacklist-lpe.conf
+      register: lpe_blacklist
+
+    - name: Allow IPv4 ESP kernel module
+      ansible.builtin.replace:
+        path: /etc/modprobe.d/blacklist-lpe.conf
+        regexp: '^install esp4 /bin/false$'
+        replace: '# install esp4 /bin/false'
+      when: lpe_blacklist.stat.exists
+
+    - name: Load esp4 kernel module
+      ansible.builtin.command:
+        cmd: modprobe esp4
+      changed_when: false
+
+  handlers:
+    - name: Reload strongSwan config
+      ansible.builtin.command:
+        cmd: swanctl --load-all

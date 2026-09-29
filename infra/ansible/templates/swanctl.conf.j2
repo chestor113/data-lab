@@ -1,0 +1,33 @@
+connections {
+    site-to-site {
+        version = 2
+
+        local_addrs = {{ ipsec_local_addr }}
+        remote_addrs = {{ ipsec_remote_addr }}
+
+        local {
+            auth = psk
+            id = {{ ipsec_local_id }}
+        }
+
+        remote {
+            auth = psk
+            id = {{ ipsec_remote_id }}
+        }
+
+        children {
+            net-net {
+                local_ts = {{ ipsec_local_ts }}
+                remote_ts = {{ ipsec_remote_ts }}
+            }
+        }
+    }
+}
+
+secrets {
+    ike-site-to-site {
+        id-local = {{ ipsec_local_id }}
+        id-remote = {{ ipsec_remote_id }}
+        secret = "{{ ipsec_psk }}"
+    }
+}

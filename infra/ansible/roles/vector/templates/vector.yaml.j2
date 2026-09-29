@@ -1,0 +1,50 @@
+sources:
+  journald:
+    type: journald
+    include_units:
+      - ssh
+      - strongswan
+    since_now: true
+    data_dir: /var/lib/vector/security-journal
+
+transforms:
+  security_filter:
+    type: filter
+    inputs:
+      - journald
+    condition: |
+      contains(string!(.message), "Failed password") ||
+      contains(string!(.message), "Invalid user") ||
+      contains(string!(.message), "IKE_SA") ||
+      contains(string!(.message), "CHILD_SA") ||
+      contains(string!(.message), "NO_PROPOSAL_CHOSEN")
+
+  normalize:
+    type: remap
+    inputs:
+      - security_filter
+    source: |
+      .hostname = .host
+      .source = .SYSLOG_IDENTIFIER
+      .pid = .SYSLOG_PID
+
+      keep = {
+        "timestamp": .timestamp,
+        "hostname": .hostname,
+        "source": .source,
+        "pid": .pid,
+        "message": .message
+      }
+
+      . = keep
+
+sinks:
+  kafka_security:
+    type: kafka
+    inputs:
+      - normalize
+    bootstrap_servers: "{{ vector_kafka_brokers | join(',') }}"
+    topic: "{{ vector_kafka_topic }}"
+    key_field: hostname
+    encoding:
+      codec: json

@@ -1,0 +1,60 @@
+connections {
+    site-to-ndrl {
+        version = 2
+
+        local_addrs = 10.10.10.10
+        remote_addrs = 109.107.175.116
+
+        local {
+            auth = psk
+            id = 89.169.130.218
+        }
+
+        remote {
+            auth = psk
+            id = 109.107.175.116
+        }
+
+        children {
+            net-ndrl {
+                local_ts = 10.10.20.0/24
+                remote_ts = 109.107.175.116/32
+                start_action = start
+            }
+        }
+    }
+
+    site-to-ltv {
+        version = 2
+
+        local_addrs = 10.10.10.10
+        remote_addrs = 193.233.83.45
+
+        local {
+            auth = psk
+            id = 89.169.130.218
+        }
+
+        remote {
+            auth = psk
+            id = 193.233.83.45
+        }
+
+        children {
+            net-ltv {
+                local_ts = 10.10.20.0/24
+                remote_ts = 193.233.83.45/32
+                start_action = start
+            }
+        }
+    }
+}
+
+secrets {
+    ike-site-to-site {
+        id-lb01 = 89.169.130.218
+        id-ndrl = 109.107.175.116
+        id-ltv = 193.233.83.45
+        secret = "{{ ipsec_psk }}"
+    }
+}

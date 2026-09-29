@@ -1,0 +1,7 @@
+---
+# handlers file for roles/vector
+
+- name: Restart Vector
+  ansible.builtin.systemd_service:
+    name: vector
+    state: restarted

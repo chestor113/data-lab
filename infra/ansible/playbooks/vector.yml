@@ -1,0 +1,7 @@
+---
+- name: Configure Vector
+  hosts: ltv
+  become: true
+
+  roles:
+    - vector

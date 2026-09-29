@@ -1,0 +1,8 @@
+ipsec_local_addr: "10.10.10.10"
+ipsec_remote_addr: "109.107.175.116"
+
+ipsec_local_id: "89.169.130.218"
+ipsec_remote_id: "109.107.175.116"
+
+ipsec_local_ts: "10.10.20.0/24"
+ipsec_remote_ts: "109.107.175.116/32"
