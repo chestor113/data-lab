@@ -6,6 +6,7 @@ resource "yandex_compute_instance" "vm" {
   hostname    = each.value.hostname
   platform_id = var.platform_id
   zone        = var.zone
+  allow_stopping_for_update = true
 
   resources {
     cores         = var.vm_cores
@@ -13,8 +14,13 @@ resource "yandex_compute_instance" "vm" {
     core_fraction = var.vm_core_fraction
   }
 
+  # scheduling_policy {
+  #   preemptible = true
+  # }
+
+
   scheduling_policy {
-    preemptible = true
+  preemptible = each.key == "lb01" || each.key == "kafka01" || each.key == "kafka02" ? false : true
   }
 
   boot_disk {

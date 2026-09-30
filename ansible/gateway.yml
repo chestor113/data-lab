@@ -39,6 +39,7 @@
         sysctl_set: true
         state: present
         reload: true
+        sysctl_file: /etc/sysctl.d/99-ip-forward.conf
 
     - name: Install nftables
       ansible.builtin.apt:
