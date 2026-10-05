@@ -1,0 +1,47 @@
+---
+- name: Prepare MinIO data disks
+  hosts: minio
+  become: true
+
+  tasks:
+    - name: Install parted
+      ansible.builtin.apt:
+        name: parted
+        state: present
+        update_cache: true
+
+    - name: Create GPT partition table and data partition
+      community.general.parted:
+        device: /dev/sdb
+        label: gpt
+        number: 1
+        state: present
+        part_start: 0%
+        part_end: 100%
+
+    - name: Install XFS tools
+      ansible.builtin.apt:
+        name: xfsprogs
+        state: present
+        update_cache: true
+
+    - name: Create XFS filesystem on MinIO data partition
+      community.general.filesystem:
+        fstype: xfs
+        dev: /dev/sdb1
+
+    - name: Create MinIO data directory
+      ansible.builtin.file:
+        path: /data
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Mount MinIO data filesystem
+      ansible.posix.mount:
+        path: /data
+        src: /dev/sdb1
+        fstype: xfs
+        opts: defaults
+        state: mounted

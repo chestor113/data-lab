@@ -1,0 +1,7 @@
+---
+- name: Setup WireGuard
+  hosts: my-srv
+  become: true
+
+  roles:
+    - wireguard_server

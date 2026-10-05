@@ -1,0 +1,10 @@
+ipsec_local_addr: "145.133.119.89"
+ipsec_remote_addr: "89.169.130.218"
+
+ipsec_local_id: "45.133.119.89"
+ipsec_remote_id: "89.169.130.218"
+
+ipsec_local_ts: "45.133.119.89/32"
+ipsec_remote_ts: "10.10.20.0/24"
+
+server_hostname: my-srv

@@ -1,0 +1,24 @@
+---
+- name: Configure MinIO network
+  hosts: minio_bootstrap
+  become: true
+
+  tasks:
+    - name: Deploy static netplan config
+      ansible.builtin.template:
+        src: ../templates/minio-netplan.yml.j2
+        dest: /etc/netplan/99-minio-static.yaml
+        owner: root
+        group: root
+        mode: "0600"
+
+    - name: Validate netplan
+      ansible.builtin.command:
+        cmd: netplan generate
+      changed_when: false
+
+    - name: Apply netplan
+      ansible.builtin.command:
+        cmd: netplan apply
+      async: 10
+      poll: 0

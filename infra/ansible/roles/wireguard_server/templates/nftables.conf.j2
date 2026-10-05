@@ -1,0 +1,37 @@
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+table inet vpn_filter {
+    chain input {
+        type filter hook input priority filter; policy drop;
+
+        iifname "lo" accept
+        ct state established,related accept
+
+        tcp dport 22 accept
+        udp dport {{ wireguard_port }} accept
+
+        ip protocol icmp accept
+        meta l4proto ipv6-icmp accept
+    }
+
+    chain forward {
+        type filter hook forward priority filter; policy drop;
+
+        iifname "{{ wireguard_interface }}" oifname "{{ wireguard_external_interface }}" accept
+        iifname "{{ wireguard_external_interface }}" oifname "{{ wireguard_interface }}" ct state established,related accept
+    }
+
+    chain output {
+        type filter hook output priority filter; policy accept;
+    }
+}
+
+table ip vpn_nat {
+    chain postrouting {
+        type nat hook postrouting priority srcnat; policy accept;
+
+        ip saddr {{ wireguard_network }} oifname "{{ wireguard_external_interface }}" masquerade
+    }
+}

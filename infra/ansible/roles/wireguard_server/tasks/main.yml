@@ -1,0 +1,46 @@
+---
+- name: Install WireGuard stuff
+  ansible.builtin.apt:
+    name:
+      - wireguard
+      - nftables
+    state: present
+    update_cache: true
+
+- name: Turn on IPv4 forwarding
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/99-wireguard.conf
+    content: |
+      net.ipv4.ip_forward=1
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Apply sysctl settings
+  ansible.builtin.command:
+    cmd: sysctl --system
+  changed_when: false
+
+- name: Remove old iptables persistence
+  ansible.builtin.apt:
+    name:
+      - iptables-persistent
+      - netfilter-persistent
+    state: absent
+    purge: true
+
+- name: Put nftables config
+  ansible.builtin.template:
+    src: nftables.conf.j2
+    dest: /etc/nftables.conf
+    owner: root
+    group: root
+    mode: "0644"
+    validate: /usr/sbin/nft -c -f %s
+  notify: Reload nftables
+
+- name: Start nftables on boot
+  ansible.builtin.systemd_service:
+    name: nftables
+    enabled: true
+    state: started

@@ -1,0 +1,3 @@
+---
+server_hostname: minio04
+static_ip: 192.168.0.204/24
