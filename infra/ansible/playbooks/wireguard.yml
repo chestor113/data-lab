@@ -1,6 +1,6 @@
 ---
 - name: Setup WireGuard
-  hosts: my-srv
+  hosts: alb
   become: true
 
   roles:

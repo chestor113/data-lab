@@ -1,0 +1,11 @@
+---
+# handlers file for roles/amneziawg_server
+- name: Reload nftables
+  ansible.builtin.systemd_service:
+    name: nftables
+    state: restarted
+
+- name: Restart AmneziaWG
+  ansible.builtin.systemd_service:
+    name: awg-quick@awg0
+    state: restarted

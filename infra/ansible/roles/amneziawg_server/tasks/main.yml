@@ -1,0 +1,13 @@
+---
+
+- name: Install AWG
+  ansible.builtin.import_tasks: install.yml
+
+- name: Set sysctl
+  ansible.builtin.import_tasks: sysctl.yml
+
+- name: Config nftables
+  ansible.builtin.import_tasks: nftables.yml
+
+- name: Config AWG
+  ansible.builtin.import_tasks: config.yml

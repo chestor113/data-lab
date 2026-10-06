@@ -1,0 +1,7 @@
+---
+- name: Setup AWG
+  hosts: alb
+  become: true
+
+  roles:
+    - amneziawg_server

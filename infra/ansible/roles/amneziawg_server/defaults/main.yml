@@ -1,0 +1,8 @@
+---
+# defaults file for roles/amneziawg_server
+
+amneziawg_interface: "awg0"
+amneziawg_address: "10.20.0.1/24"
+amneziawg_network: "10.20.0.0/24"
+amneziawg_port: 54321
+amneziawg_external_interface: "{{ ansible_default_ipv4.interface }}"

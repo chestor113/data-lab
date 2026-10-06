@@ -1,0 +1,24 @@
+---
+
+- name: Ensure AmneziaWG config directory exists
+  ansible.builtin.file:
+    path: /etc/amnezia/amneziawg
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: Put AmneziaWG config
+  ansible.builtin.template:
+    src: awg0.conf.j2
+    dest: /etc/amnezia/amneziawg/awg0.conf
+    owner: root
+    group: root
+    mode: "0600"
+  notify: Restart AmneziaWG
+
+- name: Start AmneziaWG
+  ansible.builtin.systemd_service:
+    name: awg-quick@awg0
+    enabled: true
+    state: started

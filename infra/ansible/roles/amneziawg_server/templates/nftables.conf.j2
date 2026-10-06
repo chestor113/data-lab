@@ -8,19 +8,16 @@ table inet vpn_filter {
 
         iifname "lo" accept
         ct state established,related accept
-
         tcp dport 22 accept
-        udp dport {{ wireguard_port }} accept
-
-        ip protocol icmp counter accept
-        meta l4proto ipv6-icmp accept
+        udp dport {{ amneziawg_port }} accept
+        ip protocol icmp accept
     }
 
     chain forward {
         type filter hook forward priority filter; policy drop;
 
-        iifname "{{ wireguard_interface }}" oifname "{{ wireguard_external_interface }}" counter accept
-        iifname "{{ wireguard_external_interface }}" oifname "{{ wireguard_interface }}" ct state established,related counter accept
+        iifname "{{ amneziawg_interface }}" oifname "{{ amneziawg_external_interface }}" accept
+        iifname "{{ amneziawg_external_interface }}" oifname "{{ amneziawg_interface }}" ct state established,related accept
     }
 
     chain output {
@@ -32,6 +29,6 @@ table ip vpn_nat {
     chain postrouting {
         type nat hook postrouting priority srcnat; policy accept;
 
-        ip saddr {{ wireguard_network }} oifname "{{ wireguard_external_interface }}" counter masquerade
+        ip saddr {{ amneziawg_network }} oifname "{{ amneziawg_external_interface }}" masquerade
     }
 }

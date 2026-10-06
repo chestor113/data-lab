@@ -1,0 +1,10 @@
+ipsec_local_addr: "85.155.228.46"
+ipsec_remote_addr: "89.169.130.218"
+
+ipsec_local_id: "85.155.228.46"
+ipsec_remote_id: "89.169.130.218"
+
+ipsec_local_ts: "85.155.228.46/32"
+ipsec_remote_ts: "10.10.20.0/24"
+
+server_hostname: alb
